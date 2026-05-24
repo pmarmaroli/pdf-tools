@@ -213,10 +213,13 @@
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             cursor: crosshair;
+            touch-action: none; /* prevent browser scroll when placing annotations */
         }
 
-        .annot-layer.tool-none { cursor: default; }
+        .annot-layer.tool-none { cursor: default; touch-action: auto; }
         .annot-layer.tool-erase { cursor: not-allowed; }
+
+        .annotation { touch-action: none; } /* make annotations draggable on touch */
 
         .annotation {
             position: absolute;
@@ -774,7 +777,7 @@
                     x, y,
                     size: parseInt(sizeInput.value, 10) || 16,
                     color: colorInput.value,
-                    text: currentTool === 'text' ? 'Text' : ''
+                    text: currentTool === 'text' ? 'Texte' : ''
                 }, layer);
             });
         }
@@ -821,6 +824,7 @@
                 handle.className = 'a-resize';
                 handle.title = 'Resize (keeps proportions)';
                 handle.addEventListener('mousedown', e => { e.stopPropagation(); pushUndo(); startResize(a, e); });
+                handle.addEventListener('touchstart', e => { e.stopPropagation(); e.preventDefault(); pushUndo(); startResize(a, e); }, { passive: false });
                 el.appendChild(handle);
             } else if (a.type === 'rect') {
                 el.classList.add('rect-annot');
@@ -833,6 +837,7 @@
                 rh.className = 'a-resize';
                 rh.title = 'Resize';
                 rh.addEventListener('mousedown', e => { e.stopPropagation(); pushUndo(); startResize(a, e); });
+                rh.addEventListener('touchstart', e => { e.stopPropagation(); e.preventDefault(); pushUndo(); startResize(a, e); }, { passive: false });
                 el.appendChild(rh);
             } else if (a.type === 'text') {
                 const input = document.createElement('input');
@@ -879,12 +884,19 @@
                 pushUndo();
                 startDrag(a, e);
             });
+            move.addEventListener('touchstart', e => {
+                e.stopPropagation();
+                e.preventDefault();
+                select(a);
+                pushUndo();
+                startDrag(a, e);
+            }, { passive: false });
             el.appendChild(move);
 
-            // selection / drag
+            // selection / drag — mouse
             el.addEventListener('mousedown', e => {
                 if (e.target.classList.contains('a-text')) return;
-                if (e.target.classList.contains('a-move')) return; // handled by its own listener
+                if (e.target.classList.contains('a-move')) return;
                 if (e.target.classList.contains('a-del')) return;
                 if (e.target.classList.contains('a-resize')) return;
                 e.stopPropagation();
@@ -892,6 +904,18 @@
                 pushUndo();
                 startDrag(a, e);
             });
+            // selection / drag — touch
+            el.addEventListener('touchstart', e => {
+                if (e.target.classList.contains('a-text')) return;
+                if (e.target.classList.contains('a-move')) return;
+                if (e.target.classList.contains('a-del')) return;
+                if (e.target.classList.contains('a-resize')) return;
+                e.stopPropagation();
+                e.preventDefault();
+                select(a);
+                pushUndo();
+                startDrag(a, e);
+            }, { passive: false });
 
             a.el = el;
             layer.appendChild(el);
@@ -917,49 +941,63 @@
             selectedAnnot = null;
         }
 
+        function getEventCoords(e) {
+            return e.touches
+                ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
+                : { x: e.clientX, y: e.clientY };
+        }
+
         function startResize(a, e) {
             const layer = a.el.parentNode;
             const rect = layer.getBoundingClientRect();
-            const startX = e.clientX;
+            const startX = getEventCoords(e).x;
             const startW = a.width;
             const ratio = a.height / a.width;
             function move(ev) {
-                const dx = ev.clientX - startX;
-                let nw = Math.max(20, startW + dx);
-                nw = Math.min(nw, rect.width);
-                const nh = nw * ratio;
+                ev.preventDefault();
+                const dx = getEventCoords(ev).x - startX;
+                const nw = Math.max(20, Math.min(rect.width, startW + dx));
                 a.width = nw;
-                a.height = nh;
+                a.height = nw * ratio;
                 a.el.style.width = nw + 'px';
-                a.el.style.height = nh + 'px';
+                a.el.style.height = (nw * ratio) + 'px';
             }
             function up() {
                 window.removeEventListener('mousemove', move);
                 window.removeEventListener('mouseup', up);
+                window.removeEventListener('touchmove', move);
+                window.removeEventListener('touchend', up);
             }
             window.addEventListener('mousemove', move);
             window.addEventListener('mouseup', up);
+            window.addEventListener('touchmove', move, { passive: false });
+            window.addEventListener('touchend', up);
         }
 
         function startDrag(a, e) {
             const layer = a.el.parentNode;
             const rect = layer.getBoundingClientRect();
-            const offsetX = e.clientX - rect.left - a.x;
-            const offsetY = e.clientY - rect.top - a.y;
+            const { x: cx0, y: cy0 } = getEventCoords(e);
+            const offsetX = cx0 - rect.left - a.x;
+            const offsetY = cy0 - rect.top - a.y;
             function move(ev) {
-                const nx = ev.clientX - rect.left - offsetX;
-                const ny = ev.clientY - rect.top - offsetY;
-                a.x = Math.max(0, Math.min(rect.width, nx));
-                a.y = Math.max(0, Math.min(rect.height, ny));
+                ev.preventDefault();
+                const { x, y } = getEventCoords(ev);
+                a.x = Math.max(0, Math.min(rect.width, x - rect.left - offsetX));
+                a.y = Math.max(0, Math.min(rect.height, y - rect.top - offsetY));
                 a.el.style.left = a.x + 'px';
                 a.el.style.top = a.y + 'px';
             }
             function up() {
                 window.removeEventListener('mousemove', move);
                 window.removeEventListener('mouseup', up);
+                window.removeEventListener('touchmove', move);
+                window.removeEventListener('touchend', up);
             }
             window.addEventListener('mousemove', move);
             window.addEventListener('mouseup', up);
+            window.addEventListener('touchmove', move, { passive: false });
+            window.addEventListener('touchend', up);
         }
 
         document.addEventListener('keydown', e => {
