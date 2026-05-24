@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDF... fini la galère — Annoter des PDF en ligne</title>
     <meta name="description" content="Éditeur PDF gratuit — ajoutez du texte, des croix, des coches et des points sur n'importe quel PDF. Rien n'est envoyé sur un serveur, tout se passe dans votre navigateur.">
@@ -643,10 +644,19 @@
             pagesEl.innerHTML = '';
             annotations.length = 0;
             selectedAnnot = null;
+
+            // Fit PDF to container width on any screen size
+            const containerEl = pagesEl.closest('.container');
+            const availableW = containerEl
+                ? Math.max(200, containerEl.clientWidth - 64)
+                : Math.max(200, window.innerWidth - 104);
+
             const pdf = await pdfjsLib.getDocument({ data: bytes.slice(0) }).promise;
             for (let i = 1; i <= pdf.numPages; i++) {
                 const page = await pdf.getPage(i);
-                const viewport = page.getViewport({ scale: RENDER_SCALE });
+                const naturalVp = page.getViewport({ scale: 1 });
+                const scale = Math.min(RENDER_SCALE, availableW / naturalVp.width);
+                const viewport = page.getViewport({ scale });
 
                 const wrap = document.createElement('div');
                 wrap.className = 'page-wrap';
