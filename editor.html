@@ -213,7 +213,7 @@
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             cursor: crosshair;
-            touch-action: none; /* prevent browser scroll when placing annotations */
+            touch-action: manipulation; /* tap → click, drag → scroll, pinch → zoom */
         }
 
         .annot-layer.tool-none { cursor: default; touch-action: auto; }
@@ -949,6 +949,7 @@
 
         function startResize(a, e) {
             const layer = a.el.parentNode;
+            layer.style.touchAction = 'none';
             const rect = layer.getBoundingClientRect();
             const startX = getEventCoords(e).x;
             const startW = a.width;
@@ -963,6 +964,7 @@
                 a.el.style.height = (nw * ratio) + 'px';
             }
             function up() {
+                layer.style.touchAction = '';
                 window.removeEventListener('mousemove', move);
                 window.removeEventListener('mouseup', up);
                 window.removeEventListener('touchmove', move);
@@ -976,6 +978,7 @@
 
         function startDrag(a, e) {
             const layer = a.el.parentNode;
+            layer.style.touchAction = 'none'; // block scroll only while dragging
             const rect = layer.getBoundingClientRect();
             const { x: cx0, y: cy0 } = getEventCoords(e);
             const offsetX = cx0 - rect.left - a.x;
@@ -989,6 +992,7 @@
                 a.el.style.top = a.y + 'px';
             }
             function up() {
+                layer.style.touchAction = ''; // restore scroll + zoom
                 window.removeEventListener('mousemove', move);
                 window.removeEventListener('mouseup', up);
                 window.removeEventListener('touchmove', move);
