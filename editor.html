@@ -556,7 +556,7 @@
                     await navigator.clipboard.writeText(txt);
                     showStatus('Copié dans le presse-papiers : ' + txt, 'success');
                 } catch {
-                    showStatus('Impossible de copier. Sélectionnez d'abord une annotation texte.', 'error');
+                    showStatus("Impossible de copier. Sélectionnez d'abord une annotation texte.", 'error');
                 }
             }
         });
@@ -712,7 +712,7 @@
                     toolbar.querySelectorAll('.tool-btn[data-tool]').forEach(b => b.classList.remove('active'));
                     showStatus('Signature chargée — cliquez sur une page pour la placer.', 'loading');
                 };
-                img.onerror = () => showStatus('Impossible de lire l'image.', 'error');
+                img.onerror = () => showStatus("Impossible de lire l'image.", 'error');
                 img.src = reader.result;
             };
             reader.readAsDataURL(f);
@@ -1131,7 +1131,7 @@
                                         cv.getContext('2d').drawImage(im, 0, 0);
                                         resolve(cv.toDataURL('image/png'));
                                     };
-                                    im.onerror = () => reject(new Error('Impossible de décoder l'image de signature.'));
+                                    im.onerror = () => reject(new Error("Impossible de décoder l'image de signature."));
                                     im.src = a.image.dataUrl;
                                 });
                                 imgBytes = dataUrlToBytes(pngDataUrl);
@@ -1166,7 +1166,7 @@
                 showStatus('✓ PDF enregistré sous ' + name, 'success');
             } catch (err) {
                 console.error(err);
-                showStatus('Échec de l'enregistrement du PDF : ' + err.message, 'error');
+                showStatus("Échec de l'enregistrement du PDF : " + err.message, 'error');
             } finally {
                 saveBtn.disabled = false;
             }
