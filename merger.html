@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Merger - Merge Multiple PDFs</title>
-    <meta name="description" content="Free browser-based PDF merger — combine multiple PDF files into one without uploading to a server.">
-    <link rel="canonical" href="https://pmarmaroli.github.io/pdfMerger.html">
+    <title>PDF... fini la galère — Fusionner des PDF en ligne</title>
+    <meta name="description" content="Outil PDF gratuit — combinez plusieurs fichiers PDF en un seul sans envoyer quoi que ce soit sur un serveur.">
+    <link rel="canonical" href="https://pdfs-fini-la-galere.netlify.app/merger.html">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         :root {
@@ -754,51 +754,25 @@
             }
         }
     </style>
-    <meta property="og:title" content="PDF Merger - Merge Multiple PDFs">
-    <meta property="og:description" content="Free browser-based PDF merger — combine multiple PDF files into one without uploading to a server.">
+    <meta property="og:title" content="PDF Merger - Fusionner des PDF en ligne">
+    <meta property="og:description" content="Outil PDF gratuit — combinez plusieurs fichiers PDF en un seul sans envoyer quoi que ce soit sur un serveur.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://pmarmaroli.github.io/pdfMerger.html">
-    <meta property="og:image" content="https://pmarmaroli.github.io/patrick-marmaroli.png">
+    <meta property="og:url" content="https://pdfs-fini-la-galere.netlify.app/merger.html">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="PDF Merger - Merge Multiple PDFs">
-    <meta name="twitter:description" content="Free browser-based PDF merger — combine multiple PDF files into one without uploading to a server.">
-    <meta name="twitter:image" content="https://pmarmaroli.github.io/patrick-marmaroli.png">
-    <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "SoftwareApplication",
-      "name": "PDF Merger",
-      "url": "https://pmarmaroli.github.io/pdfMerger.html",
-      "description": "Free browser-based PDF merger — combine multiple PDF files into one without uploading to a server.",
-      "applicationCategory": "WebApplication",
-      "operatingSystem": "Any (browser-based)",
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
-    },
-    {
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://pmarmaroli.github.io/" },
-        { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://pmarmaroli.github.io/#portfolio" },
-        { "@type": "ListItem", "position": 3, "name": "PDF Merger", "item": "https://pmarmaroli.github.io/pdfMerger.html" }
-      ]
-    }
-  ]
-}
-    </script>
+    <meta name="twitter:title" content="PDF Merger - Fusionner des PDF en ligne">
+    <meta name="twitter:description" content="Outil PDF gratuit — combinez plusieurs fichiers PDF en un seul sans envoyer quoi que ce soit sur un serveur.">
 
 </head>
 <body>
     <div class="container">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><a href="/" style="color:#6b7280;text-decoration:none;font-size:0.9rem;">← PDF Tools</a><a href="/editor.html" style="color:#3b82f6;text-decoration:none;font-size:0.9rem;font-weight:500;">📝 PDF Editor &rarr;</a></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><a href="/" style="color:#6b7280;text-decoration:none;font-size:0.9rem;">← Accueil</a><a href="/editor.html" style="color:#3b82f6;text-decoration:none;font-size:0.9rem;font-weight:500;">📝 PDF Editor &rarr;</a></div>
         <h1>📄 PDF Merger</h1>
-        <p class="subtitle">Merge PDFs and images into one PDF - 100% client-side</p>
+        <p class="subtitle">Fusionnez des PDF, images et documents en un seul fichier — 100% local</p>
 
         <div class="upload-area" id="uploadArea">
             <div class="upload-icon">📁</div>
-            <div class="upload-text" id="uploadText">Click to select PDFs/Images or drag & drop</div>
-            <div class="upload-subtext" id="uploadSubtext">Supports PDF, DOCX, JPG, PNG, HEIC and more</div>
+            <div class="upload-text" id="uploadText">Cliquez pour sélectionner des PDF/Images ou glissez-déposez</div>
+            <div class="upload-subtext" id="uploadSubtext">PDF, DOCX, JPG, PNG, HEIC et plus encore</div>
         </div>
         <input type="file" id="fileInput" accept="application/pdf,image/*,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" multiple style="display: none;">
         <input type="file" id="cameraInput" accept="image/*" capture="environment" multiple style="display: none;">
@@ -806,28 +780,28 @@
         <div class="file-list" id="fileList"></div>
 
         <div class="page-grid-section" id="pageGridSection" style="display:none">
-            <div class="page-grid-title" id="pageGridTitle">📋 Page order — drag to reorder</div>
+            <div class="page-grid-title" id="pageGridTitle">📋 Ordre des pages — glissez pour réorganiser</div>
             <div class="page-grid" id="pageGrid"></div>
         </div>
 
-        <button class="camera-btn" id="cameraBtn">📸 Take Photo</button>
+        <button class="camera-btn" id="cameraBtn">📸 Prendre une photo</button>
 
         <div class="actions">
-            <button class="merge-btn" id="mergeBtn" disabled>Create PDF</button>
-            <button class="clear-btn" id="clearBtn">Clear All</button>
+            <button class="merge-btn" id="mergeBtn" disabled>Créer le PDF</button>
+            <button class="clear-btn" id="clearBtn">Tout effacer</button>
         </div>
 
         <div class="status" id="status"></div>
 
-        <input type="text" id="filenameInput" class="filename-input" placeholder="Enter PDF name (optional)" disabled />
+        <input type="text" id="filenameInput" class="filename-input" placeholder="Nom du fichier PDF (optionnel)" disabled />
         <div class="filename-preview" id="filenamePreview"></div>
 
         <div class="download-section" id="downloadSection">
-            <button class="download-btn" id="downloadBtn">⬇️ Download PDF</button>
+            <button class="download-btn" id="downloadBtn">⬇️ Télécharger le PDF</button>
         </div>
 
         <div class="info-box">
-            <strong>How it works:</strong> Select or drag multiple PDF files, Word documents (DOCX) and/or images (JPG, PNG, HEIC, etc.). DOCX files are rendered page by page; images are converted to PDF pages. They will be merged in the order shown. All processing happens in your browser — no files are uploaded to any server.
+            <strong>Comment ça marche&nbsp;:</strong> Sélectionnez ou glissez plusieurs fichiers PDF, documents Word (DOCX) et/ou images (JPG, PNG, HEIC, etc.). Les fichiers DOCX sont convertis page par page&nbsp;; les images sont transformées en pages PDF. La fusion respecte l'ordre affiché. Tout le traitement se fait dans votre navigateur — aucun fichier n'est envoyé sur un serveur.
         </div>
 
         <div class="debug-info" id="debugInfo"></div>
@@ -906,7 +880,7 @@
 
                 const imgHtml = src
                     ? `<img src="${src}" alt="PDF page preview" style="transform:rotate(${rot}deg);">`
-                    : `<span style="font-size:11px;color:var(--text-secondary);">Loading…</span>`;
+                    : `<span style="font-size:11px;color:var(--text-secondary);">Chargement…</span>`;
                 const badgeClass = rot !== 0 ? 'thumb-badge show' : 'thumb-badge';
 
                 const isFirst = orderIndex === 0;
@@ -916,11 +890,11 @@
                     <div class="thumb-frame">${imgHtml}</div>
                     <div class="thumb-label">${entry.file.name.replace(/\.[^.]+$/, '')} · p${item.pageIndex + 1}</div>
                     <span class="${badgeClass}">${rot}°</span>
-                    <button class="thumb-rotate" title="Rotate 90°" aria-label="Rotate 90 degrees">↻</button>
-                    <button class="thumb-delete" title="Delete page" aria-label="Delete page">✕</button>
+                    <button class="thumb-rotate" title="Pivoter de 90°" aria-label="Pivoter de 90°">↻</button>
+                    <button class="thumb-delete" title="Supprimer la page" aria-label="Supprimer la page">✕</button>
                     <div class="thumb-move-row">
-                        <button class="thumb-move-btn move-prev" title="Move earlier" aria-label="Move earlier" ${isFirst ? 'disabled' : ''}>◀</button>
-                        <button class="thumb-move-btn move-next" title="Move later" aria-label="Move later" ${isLast ? 'disabled' : ''}>▶</button>
+                        <button class="thumb-move-btn move-prev" title="Déplacer avant" aria-label="Déplacer avant" ${isFirst ? 'disabled' : ''}>◀</button>
+                        <button class="thumb-move-btn move-next" title="Déplacer après" aria-label="Déplacer après" ${isLast ? 'disabled' : ''}>▶</button>
                     </div>
                 `;
 
@@ -1007,7 +981,7 @@
                 file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
             if (isDocx) {
-                showStatus('Converting DOCX to pages…', 'loading');
+                showStatus('Conversion du DOCX en pages…', 'loading');
                 try {
                     const pages = await docxToPages(file);
                     hideStatus();
@@ -1022,7 +996,7 @@
                     };
                 } catch (e) {
                     hideStatus();
-                    throw new Error('Could not convert DOCX: ' + e.message);
+                    throw new Error('Impossible de convertir le DOCX : ' + e.message);
                 }
             }
 
@@ -1070,10 +1044,10 @@
         
         if (isMobile) {
             cameraBtn.classList.add('mobile-show');
-            uploadText.textContent = 'Tap to select PDFs/Photos';
-            uploadSubtext.textContent = 'Or use camera button below';
+            uploadText.textContent = 'Appuyez pour sélectionner des PDF/Photos';
+            uploadSubtext.textContent = 'Ou utilisez le bouton appareil photo ci-dessous';
             const gridTitle = document.getElementById('pageGridTitle');
-            if (gridTitle) gridTitle.textContent = '📋 Page order — tap ◀ ▶ to reorder';
+            if (gridTitle) gridTitle.textContent = '📋 Ordre des pages — appuyez sur ◀ ▶ pour réorganiser';
         }
 
         // Upload area click
@@ -1097,7 +1071,7 @@
                 }
             } catch (error) {
                 console.error('Error handling files:', error);
-                showStatus('Error loading files: ' + error.message, 'error');
+                showStatus('Erreur lors du chargement des fichiers : ' + error.message, 'error');
             }
             fileInput.value = ''; // Reset input
             return false;
@@ -1115,7 +1089,7 @@
                 }
             } catch (error) {
                 console.error('Error handling camera files:', error);
-                showStatus('Error loading photos: ' + error.message, 'error');
+                showStatus('Erreur lors du chargement des photos : ' + error.message, 'error');
             }
             cameraInput.value = ''; // Reset input
             return false;
@@ -1190,24 +1164,24 @@
                 if (files.length > 0) {
                     handleFiles(files);
                 } else if (allFiles.length > 0) {
-                    showStatus('Please drop PDF, DOCX or image files only. Found: ' + allFiles.map(f => f.type).join(', '), 'error');
+                    showStatus('Veuillez déposer uniquement des fichiers PDF, DOCX ou des images. Found: ' + allFiles.map(f => f.type).join(', '), 'error');
                 } else {
-                    showStatus('No files detected in drop event.', 'error');
+                    showStatus('Aucun fichier détecté dans l'événement de dépôt.', 'error');
                 }
             } catch (error) {
                 console.error('Error handling dropped files:', error);
-                showStatus('Error loading files: ' + error.message, 'error');
+                showStatus('Erreur lors du chargement des fichiers : ' + error.message, 'error');
             }
             return false;
         }, false);
 
         async function handleFiles(files) {
             if (files.length === 0) {
-                showStatus('Please select PDF or image files.', 'error');
+                showStatus('Veuillez sélectionner des fichiers PDF ou des images.', 'error');
                 return;
             }
 
-            for (const file of files) {
+            for (const file sur files) {
                 const entry = await buildEntry(file);
                 const newIndex = selectedFiles.length;
                 selectedFiles.push(entry);
@@ -1238,7 +1212,7 @@
                             <span class="file-name" title="${file.name}">${file.name}</span>
                             <span class="file-size">${entry.pageCount} page${entry.pageCount === 1 ? '' : 's'} · ${formatFileSize(file.size)}</span>
                         </div>
-                        <button class="remove-btn" data-index="${index}">Remove</button>
+                        <button class="remove-btn" data-index="${index}">Supprimer</button>
                     </div>
                 `;
                 fileList.appendChild(fileItem);
@@ -1248,7 +1222,7 @@
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
                     const index = parseInt(this.getAttribute('data-index'));
-                    // Remove this file's pages from pageOrder; fix remaining fileIndex refs
+                    // Supprimer this file's pages from pageOrder; fix remaining fileIndex refs
                     pageOrder = pageOrder
                         .filter(item => item.fileIndex !== index)
                         .map(item => item.fileIndex > index
@@ -1338,7 +1312,7 @@
                 return true;
             }
 
-            // Search backwards from the ideal cut point for a white row (up to 20% of page)
+            // Search backwards from the ideal cut point for a white row (up to 20% sur page)
             function findSafeCut(fromY) {
                 const target = fromY + CONTENT_H;
                 if (target >= total) return total;
@@ -1349,7 +1323,7 @@
                 return target;
             }
 
-            // Skip leading white rows at the start of the next page
+            // Skip leading white rows at the start sur the next page
             function findContentStart(fromY) {
                 const limit = Math.min(fromY + 80, total);
                 for (let sy = fromY; sy < limit; sy++) {
@@ -1413,7 +1387,7 @@
                 drawStripContents(strip, entry, index);
             } catch (err) {
                 console.error('Thumbnail render failed:', err);
-                strip.innerHTML = `<div class="page-strip-empty">Could not render thumbnails: ${err.message}</div>`;
+                strip.innerHTML = `<div class="page-strip-empty">Impossible de générer les aperçus : ${err.message}</div>`;
             }
         }
 
@@ -1422,18 +1396,18 @@
                 const rot = entry.rotations[pageIndex] || 0;
                 const imgHtml = src
                     ? `<img src="${src}" alt="PDF page preview" style="transform: rotate(${rot}deg);">`
-                    : `<span style="font-size:11px;color:var(--text-secondary);">Loading…</span>`;
+                    : `<span style="font-size:11px;color:var(--text-secondary);">Chargement…</span>`;
                 const badgeClass = rot !== 0 ? 'thumb-badge show' : 'thumb-badge';
                 return `
                     <div class="thumb" data-file="${fileIndex}" data-page="${pageIndex}">
                         <div class="thumb-frame">${imgHtml}</div>
                         <div class="thumb-label">Page ${pageIndex + 1}</div>
                         <span class="${badgeClass}">${rot}°</span>
-                        <button class="thumb-rotate" data-rotate-file="${fileIndex}" data-rotate-page="${pageIndex}" title="Rotate 90°">↻</button>
+                        <button class="thumb-rotate" data-rotate-file="${fileIndex}" data-rotate-page="${pageIndex}" title="Pivoter de 90°">↻</button>
                     </div>
                 `;
             }).join('');
-            strip.innerHTML = thumbs || '<div class="page-strip-empty">No pages.</div>';
+            strip.innerHTML = thumbs || '<div class="page-strip-empty">Aucune page.</div>';
 
             strip.querySelectorAll('.thumb-rotate').forEach(btn => {
                 btn.addEventListener('click', function(e) {
@@ -1463,7 +1437,7 @@
         function updateFileRowHeader(index) {
             const entry = selectedFiles[index];
             const rotatedCount = entry.rotations.filter(r => r !== 0).length;
-            const rotatedSuffix = rotatedCount > 0 ? ` · ${rotatedCount} rotated` : '';
+            const rotatedSuffix = rotatedCount > 0 ? ` · ${rotatedCount} pivoté${rotatedCount > 1 ? 's' : ''}` : '';
             const sizeEl = fileList.querySelector(
                 `.file-item:nth-child(${index + 1}) .file-size`
             );
@@ -1515,7 +1489,7 @@
                 return;
             }
             const final = computeFinalFilename(filenameInput.value);
-            filenamePreview.innerHTML = `Will be saved as: <strong>${final}</strong>`;
+            filenamePreview.innerHTML = `Sera enregistré sous : <strong>${final}</strong>`;
         }
 
         filenameInput.addEventListener('input', updateFilenamePreview);
@@ -1580,13 +1554,13 @@
         // Merge PDFs and Images
         mergeBtn.addEventListener('click', async () => {
             if (pageOrder.length === 0) {
-                showStatus('Please select at least 1 file to process.', 'error');
+                showStatus('Veuillez sélectionner au moins 1 fichier à traiter.', 'error');
                 return;
             }
 
             try {
                 clearDebug();
-                showStatus('Processing files...', 'loading');
+                showStatus('Traitement des fichiers...', 'loading');
                 mergeBtn.disabled = true;
 
                 const { PDFDocument } = PDFLib;
@@ -1594,7 +1568,7 @@
 
                 // Pre-load all source PDFs once
                 const pdfDocCache = {};
-                for (const item of pageOrder) {
+                for (const item sur pageOrder) {
                     const entry = selectedFiles[item.fileIndex];
                     if (entry.type === 'pdf' && !pdfDocCache[item.fileIndex]) {
                         const bytes = await entry.file.arrayBuffer();
@@ -1605,7 +1579,7 @@
                 for (let i = 0; i < pageOrder.length; i++) {
                     const item = pageOrder[i];
                     const entry = selectedFiles[item.fileIndex];
-                    showStatus(`Processing page ${i + 1} of ${pageOrder.length}…`, 'loading');
+                    showStatus(`Traitement de la page ${i + 1} sur ${pageOrder.length}…`, 'loading');
 
                     if (entry.type === 'pdf') {
                         const srcDoc = pdfDocCache[item.fileIndex];
@@ -1639,7 +1613,7 @@
 
                 mergedPdfBytes = await mergedPdf.save();
 
-                showStatus(`✅ Successfully processed ${pageOrder.length} page(s)!`, 'success');
+                showStatus(`✅ ✅ Traitement terminé : ${pageOrder.length} page(s) traitée(s) !`, 'success');
                 downloadSection.classList.add('show');
                 filenameInput.focus();
                 filenameInput.disabled = false;
@@ -1648,7 +1622,7 @@
 
             } catch (error) {
                 console.error('Error processing files:', error);
-                showStatus(`❌ Error: ${error.message}`, 'error');
+                showStatus(`❌ Erreur : ${error.message}`, 'error');
                 mergeBtn.disabled = false;
             }
         });
@@ -1659,7 +1633,7 @@
 
             const filename = computeFinalFilename(filenameInput.value);
 
-            debugLog(`📥 Downloading as: ${filename}`);
+            debugLog(`📥 Téléchargement sous : ${filename}`);
 
             const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
             const ua = navigator.userAgent || '';
@@ -1690,7 +1664,7 @@
                 const win = window.open(url, '_blank');
                 if (!win) {
                     // Popup blocked — navigate the current tab as a last resort
-                    showStatus('⚠️ Popup blocked. Tap the download button again or allow popups, then use the Share button to save the PDF.', 'error');
+                    showStatus('⚠️ Fenêtre contextuelle bloquée. Appuyez à nouveau sur le bouton de téléchargement ou autorisez les fenêtres contextuelles, puis utilisez le bouton Partager pour enregistrer le PDF.', 'error');
                     location.href = url;
                 }
                 setTimeout(() => URL.revokeObjectURL(url), 60000);

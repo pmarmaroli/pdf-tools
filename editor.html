@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Editor - Add Text, Checks and Marks to PDFs</title>
-    <meta name="description" content="Free browser-based PDF editor — add text, crosses, checkmarks and dots on top of any PDF. Nothing is uploaded, all editing happens locally in your browser.">
-    <link rel="canonical" href="https://pmarmaroli.github.io/pdfEditor.html">
+    <title>PDF... fini la galère — Annoter des PDF en ligne</title>
+    <meta name="description" content="Éditeur PDF gratuit — ajoutez du texte, des croix, des coches et des points sur n'importe quel PDF. Rien n'est envoyé sur un serveur, tout se passe dans votre navigateur.">
+    <link rel="canonical" href="https://pdfs-fini-la-galere.netlify.app/editor.html">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         :root {
@@ -467,48 +467,48 @@
 </head>
 <body>
     <div class="container">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><a href="/" class="back-link">← PDF Tools</a><a href="/merger.html" style="color:#3b82f6;text-decoration:none;font-size:0.9rem;font-weight:500;">📄 PDF Merger →</a></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><a href="/" class="back-link">← Accueil</a><a href="/merger.html" style="color:#3b82f6;text-decoration:none;font-size:0.9rem;font-weight:500;">📄 PDF Merger →</a></div>
         <h1>📝 PDF Editor</h1>
-        <p class="subtitle">Add text, checkmarks, crosses and dots on any PDF — 100% in your browser, no uploads.</p>
+        <p class="subtitle">Ajoutez du texte, des coches, des croix et des points sur n'importe quel PDF — 100% local, aucun envoi.</p>
 
         <div class="upload-area" id="uploadArea">
             <div class="upload-icon">📄</div>
-            <div class="upload-text">Drop a PDF here or click to choose</div>
-            <div class="upload-subtext">Single PDF file</div>
+            <div class="upload-text">Déposez un PDF ici ou cliquez pour choisir</div>
+            <div class="upload-subtext">Un seul fichier PDF</div>
             <input type="file" id="fileInput" accept="application/pdf" style="display:none">
         </div>
 
         <div class="editor" id="editor">
             <div class="toolbar" id="toolbar">
-                <button class="tool-btn active" data-tool="select">🖱 Select</button>
-                <button class="tool-btn" data-tool="text">✏️ Text</button>
-                <button class="tool-btn" data-tool="cross">✕ Cross</button>
-                <button class="tool-btn" data-tool="check">✓ Check</button>
-                <button class="tool-btn" data-tool="dot">● Dot</button>
-                <button class="tool-btn" data-tool="rect" title="Draw a white rectangle to mask text underneath">⬜ White box</button>
+                <button class="tool-btn active" data-tool="select">🖱 Sélection</button>
+                <button class="tool-btn" data-tool="text">✏️ Texte</button>
+                <button class="tool-btn" data-tool="cross">✕ Croix</button>
+                <button class="tool-btn" data-tool="check">✓ Coche</button>
+                <button class="tool-btn" data-tool="dot">● Point</button>
+                <button class="tool-btn" data-tool="rect" title="Dessiner un rectangle blanc pour masquer du texte">⬜ Boîte blanche</button>
                 <button class="tool-btn" id="signatureBtn">🖋 Signature…</button>
                 <input type="file" id="signatureInput" accept="image/png,image/jpeg" style="display:none">
                 <span class="tool-sep"></span>
                 <span class="tool-group">
-                    Size <input type="number" id="sizeInput" value="16" min="6" max="120" step="1">
+                    Taille <input type="number" id="sizeInput" value="16" min="6" max="120" step="1">
                 </span>
                 <span class="tool-group">
-                    Color <input type="color" id="colorInput" value="#1e3a8a">
+                    Couleur <input type="color" id="colorInput" value="#1e3a8a">
                 </span>
                 <span class="tool-sep"></span>
-                <button class="tool-btn" id="clearPageBtn" title="Remove all annotations on every page">🗑 Clear all</button>
+                <button class="tool-btn" id="clearPageBtn" title="Supprimer toutes les annotations sur toutes les pages">🗑 Tout effacer</button>
             </div>
 
             <div class="pages" id="pages"></div>
 
-            <input type="text" class="filename-input" id="filenameInput" placeholder="output filename (without .pdf)">
+            <input type="text" class="filename-input" id="filenameInput" placeholder="nom du fichier de sortie (sans .pdf)">
 
             <div class="actions">
-                <button class="action-btn reset-btn" id="resetBtn">Load another PDF</button>
-                <button class="action-btn save-btn" id="saveBtn">💾 Save edited PDF</button>
+                <button class="action-btn reset-btn" id="resetBtn">Charger un autre PDF</button>
+                <button class="action-btn save-btn" id="saveBtn">💾 Enregistrer le PDF</button>
             </div>
 
-            <div class="hint">Tip: click a tool, then click on a page to place a mark. Click an annotation to select it; use the <strong>green ⤧ handle</strong> to drag it precisely, or the <strong>arrow keys</strong> to nudge by 1 px (Shift+arrow = 10 px). Press <strong>Escape</strong> in a text field before using arrows. The <strong>red ×</strong> deletes only the selected annotation. Press <strong>Ctrl+Z</strong> (or Cmd+Z) to undo the last change.</div>
+            <div class="hint">Astuce : choisissez un outil, puis cliquez sur une page pour placer une marque. Cliquez sur une annotation pour la sélectionner ; utilisez la <strong>poignée verte ⤧</strong> pour la déplacer précisément, ou les <strong>touches fléchées</strong> pour la déplacer d'1 px (Maj+flèche = 10 px). Appuyez sur <strong>Échap</strong> dans un champ texte avant d'utiliser les flèches. La <strong>croix rouge ×</strong> supprime uniquement l'annotation sélectionnée. Appuyez sur <strong>Ctrl+Z</strong> (ou Cmd+Z) pour annuler la dernière modification.</div>
             <div class="status" id="status"></div>
         </div>
     </div>
@@ -551,9 +551,9 @@
             } else {
                 try {
                     await navigator.clipboard.writeText(txt);
-                    showStatus('Copied to clipboard: ' + txt, 'success');
+                    showStatus('Copié dans le presse-papiers : ' + txt, 'success');
                 } catch {
-                    showStatus('Could not copy. Select a text annotation first.', 'error');
+                    showStatus('Impossible de copier. Sélectionnez d'abord une annotation texte.', 'error');
                 }
             }
         });
@@ -613,7 +613,7 @@
             uploadArea.classList.remove('dragover');
             const f = e.dataTransfer.files[0];
             if (f && f.type === 'application/pdf') loadPdf(f);
-            else showStatus('Please drop a PDF file.', 'error');
+            else showStatus('Veuillez déposer un fichier PDF.', 'error');
         });
         fileInput.addEventListener('change', e => {
             const f = e.target.files[0];
@@ -622,7 +622,7 @@
 
         async function loadPdf(file) {
             try {
-                showStatus('Loading PDF…', 'loading');
+                showStatus('Chargement du PDF…', 'loading');
                 originalFileName = file.name.replace(/\.pdf$/i, '');
                 filenameInput.value = originalFileName + '_edited';
                 originalPdfBytes = await file.arrayBuffer();
@@ -632,7 +632,7 @@
                 hideStatus();
             } catch (err) {
                 console.error(err);
-                showStatus('Failed to load PDF: ' + err.message, 'error');
+                showStatus('Échec du chargement du PDF : ' + err.message, 'error');
             }
         }
 
@@ -707,9 +707,9 @@
                     };
                     currentTool = 'signature';
                     toolbar.querySelectorAll('.tool-btn[data-tool]').forEach(b => b.classList.remove('active'));
-                    showStatus('Signature loaded — click on a page to place it.', 'loading');
+                    showStatus('Signature chargée — cliquez sur une page pour la placer.', 'loading');
                 };
-                img.onerror = () => showStatus('Could not read image.', 'error');
+                img.onerror = () => showStatus('Impossible de lire l'image.', 'error');
                 img.src = reader.result;
             };
             reader.readAsDataURL(f);
@@ -718,12 +718,12 @@
 
         clearPageBtn.addEventListener('click', () => {
             if (annotations.length === 0) return;
-            if (!confirm('Remove all annotations on every page?')) return;
+            if (!confirm('Supprimer toutes les annotations sur toutes les pages ?')) return;
             annotations.slice().forEach(a => removeAnnotation(a));
         });
 
         resetBtn.addEventListener('click', () => {
-            if (annotations.length && !confirm('Discard current edits and load a new PDF?')) return;
+            if (annotations.length && !confirm('Abandonner les modifications et charger un nouveau PDF ?')) return;
             originalPdfBytes = null;
             annotations.length = 0;
             pagesEl.innerHTML = '';
@@ -1013,7 +1013,7 @@
             if (!originalPdfBytes) return;
             try {
                 saveBtn.disabled = true;
-                showStatus('<span class="spinner"></span>Building PDF…', 'loading');
+                showStatus('<span class="spinner"></span>Construction du PDF…', 'loading');
                 deselect();
 
                 const { PDFDocument, StandardFonts, rgb } = PDFLib;
@@ -1093,7 +1093,7 @@
                                         cv.getContext('2d').drawImage(im, 0, 0);
                                         resolve(cv.toDataURL('image/png'));
                                     };
-                                    im.onerror = () => reject(new Error('Could not decode signature image.'));
+                                    im.onerror = () => reject(new Error('Impossible de décoder l'image de signature.'));
                                     im.src = a.image.dataUrl;
                                 });
                                 imgBytes = dataUrlToBytes(pngDataUrl);
@@ -1125,10 +1125,10 @@
                 link.click();
                 document.body.removeChild(link);
                 setTimeout(() => URL.revokeObjectURL(url), 1000);
-                showStatus('✓ PDF saved as ' + name, 'success');
+                showStatus('✓ PDF enregistré sous ' + name, 'success');
             } catch (err) {
                 console.error(err);
-                showStatus('Failed to save PDF: ' + err.message, 'error');
+                showStatus('Échec de l'enregistrement du PDF : ' + err.message, 'error');
             } finally {
                 saveBtn.disabled = false;
             }
@@ -1194,8 +1194,8 @@
       <div class="qp-title">📋 Quick paste</div>
       <div id="qpList"></div>
       <div class="qp-add-row">
-        <input id="qpInput" type="text" placeholder="Add entry…" maxlength="120">
-        <button id="qpAddBtn" title="Add">＋</button>
+        <input id="qpInput" type="text" placeholder="Ajouter une entrée…" maxlength="120">
+        <button id="qpAddBtn" title="Ajouter">＋</button>
       </div>
     </aside>
     <script>
@@ -1216,7 +1216,7 @@
             btn.textContent = text;
             const del = document.createElement('button');
             del.className = 'qp-del';
-            del.title = 'Remove';
+            del.title = "Retirer";
             del.textContent = '×';
             del.addEventListener('click', function (e) {
               e.stopPropagation();
