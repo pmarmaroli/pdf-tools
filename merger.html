@@ -1166,7 +1166,7 @@
                 } else if (allFiles.length > 0) {
                     showStatus('Veuillez déposer uniquement des fichiers PDF, DOCX ou des images. Found: ' + allFiles.map(f => f.type).join(', '), 'error');
                 } else {
-                    showStatus('Aucun fichier détecté dans l'événement de dépôt.', 'error');
+                    showStatus("Aucun fichier détecté dans l'événement de dépôt.", 'error');
                 }
             } catch (error) {
                 console.error('Error handling dropped files:', error);
