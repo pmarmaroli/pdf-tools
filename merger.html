@@ -278,6 +278,30 @@
             opacity: 1;
         }
 
+        .thumb-zoom {
+            position: absolute;
+            bottom: 24px;
+            left: 4px;
+            background: rgba(30, 58, 138, 0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            font-size: 15px;
+            line-height: 32px;
+            padding: 0;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .thumb:hover .thumb-zoom {
+            opacity: 1;
+        }
+
         .thumb-move-row {
             display: none;
             justify-content: space-between;
@@ -313,7 +337,58 @@
         @media (pointer: coarse) {
             .thumb-rotate { opacity: 1; width: 36px; height: 36px; line-height: 36px; font-size: 18px; }
             .thumb-delete { opacity: 1; width: 36px; height: 36px; line-height: 36px; font-size: 18px; bottom: 28px; }
+            .thumb-zoom { opacity: 1; width: 36px; height: 36px; line-height: 36px; font-size: 17px; bottom: 28px; }
             .thumb-move-row { display: flex; }
+        }
+
+        .lightbox-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .lightbox-overlay.show {
+            display: flex;
+        }
+
+        .lightbox-img {
+            max-width: 95vw;
+            max-height: 90vh;
+            background: white;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.92);
+            color: #1e3a8a;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            font-size: 22px;
+            line-height: 44px;
+            padding: 0;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .lightbox-spinner .spinner {
+            width: 40px;
+            height: 40px;
+            border-width: 4px;
+            border-color: #ffffff;
+            border-top-color: transparent;
+            margin: 0;
         }
 
         .thumb-badge {
@@ -808,6 +883,12 @@
         <div class="debug-info" id="debugInfo"></div>
     </div>
 
+    <div class="lightbox-overlay" id="lightboxOverlay">
+        <button class="lightbox-close" id="lightboxClose" title="Fermer" aria-label="Fermer">✕</button>
+        <div class="lightbox-spinner" id="lightboxSpinner"><span class="spinner"></span></div>
+        <img class="lightbox-img" id="lightboxImg" alt="Aperçu agrandi de la page" style="display:none">
+    </div>
+
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js" defer></script>
     <script src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js" defer></script>
     <script src="https://unpkg.com/mammoth@1.8.0/mammoth.browser.min.js" defer></script>
@@ -892,6 +973,7 @@
                     <div class="thumb-label">${entry.file.name.replace(/\.[^.]+$/, '')} · p${item.pageIndex + 1}</div>
                     <span class="${badgeClass}">${rot}°</span>
                     <button class="thumb-rotate" title="Pivoter de 90°" aria-label="Pivoter de 90°">↻</button>
+                    <button class="thumb-zoom" title="Agrandir la page" aria-label="Agrandir la page">🔍</button>
                     <button class="thumb-delete" title="Supprimer la page" aria-label="Supprimer la page">✕</button>
                     <div class="thumb-move-row">
                         <button class="thumb-move-btn move-prev" title="Déplacer avant" aria-label="Déplacer avant" ${isFirst ? 'disabled' : ''}>◀</button>
@@ -903,6 +985,11 @@
                     e.stopPropagation();
                     entry.rotations[item.pageIndex] = (entry.rotations[item.pageIndex] + 90) % 360;
                     renderPageGrid();
+                });
+
+                div.querySelector('.thumb-zoom').addEventListener('click', e => {
+                    e.stopPropagation();
+                    openLightbox(item);
                 });
 
                 div.querySelector('.move-prev').addEventListener('click', e => {
@@ -1683,6 +1770,94 @@
             document.body.removeChild(link);
 
             setTimeout(() => URL.revokeObjectURL(url), 1000);
+        });
+
+        // === Lightbox (page zoom) ===
+        const lightboxOverlay = document.getElementById('lightboxOverlay');
+        const lightboxImg = document.getElementById('lightboxImg');
+        const lightboxClose = document.getElementById('lightboxClose');
+        const lightboxSpinner = document.getElementById('lightboxSpinner');
+        let lightboxObjectUrl = null;
+
+        // Render a high-resolution preview of a single page (thumbnails are only 200px wide).
+        async function getHiResPreview(item) {
+            const entry = selectedFiles[item.fileIndex];
+            if (entry.type === 'image') {
+                return URL.createObjectURL(entry.file); // full-res original
+            }
+            if (entry.type === 'docx') {
+                return entry.docxPages[item.pageIndex]; // already rendered at A4 resolution
+            }
+            // PDF — render the requested page at a larger scale on demand
+            const arrayBuffer = await entry.file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            try {
+                const page = await pdf.getPage(item.pageIndex + 1); // pdf.js is 1-indexed
+                const viewport = page.getViewport({ scale: 1 });
+                const targetWidth = 1400;
+                const scale = targetWidth / viewport.width;
+                const scaledViewport = page.getViewport({ scale });
+                const canvas = document.createElement('canvas');
+                canvas.width = scaledViewport.width;
+                canvas.height = scaledViewport.height;
+                const ctx = canvas.getContext('2d');
+                await page.render({ canvasContext: ctx, viewport: scaledViewport }).promise;
+                return canvas.toDataURL('image/jpeg', 0.85);
+            } finally {
+                if (pdf.destroy) await pdf.destroy();
+            }
+        }
+
+        function revokeLightboxUrl() {
+            if (lightboxObjectUrl) {
+                URL.revokeObjectURL(lightboxObjectUrl);
+                lightboxObjectUrl = null;
+            }
+        }
+
+        async function openLightbox(item) {
+            const rot = selectedFiles[item.fileIndex].rotations[item.pageIndex] || 0;
+            lightboxImg.style.display = 'none';
+            lightboxSpinner.style.display = 'block';
+            lightboxOverlay.classList.add('show');
+            try {
+                const src = await getHiResPreview(item);
+                revokeLightboxUrl();
+                if (src.startsWith('blob:')) lightboxObjectUrl = src;
+                lightboxImg.src = src;
+                lightboxImg.style.transform = `rotate(${rot}deg)`;
+                // When rotated 90/270 the bounding box swaps, so swap the max constraints to keep it on-screen.
+                if (rot === 90 || rot === 270) {
+                    lightboxImg.style.maxWidth = '90vh';
+                    lightboxImg.style.maxHeight = '95vw';
+                } else {
+                    lightboxImg.style.maxWidth = '95vw';
+                    lightboxImg.style.maxHeight = '90vh';
+                }
+                lightboxImg.style.display = 'block';
+            } catch (err) {
+                console.error('Lightbox render failed:', err);
+                closeLightbox();
+                showStatus("Impossible d'agrandir cette page : " + err.message, 'error');
+            } finally {
+                lightboxSpinner.style.display = 'none';
+            }
+        }
+
+        function closeLightbox() {
+            lightboxOverlay.classList.remove('show');
+            lightboxImg.src = '';
+            lightboxImg.style.display = 'none';
+            lightboxSpinner.style.display = 'none';
+            revokeLightboxUrl();
+        }
+
+        lightboxClose.addEventListener('click', closeLightbox);
+        lightboxOverlay.addEventListener('click', e => {
+            if (e.target === lightboxOverlay) closeLightbox();
+        });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && lightboxOverlay.classList.contains('show')) closeLightbox();
         });
 
         // Clear all
