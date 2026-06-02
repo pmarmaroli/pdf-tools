@@ -1182,7 +1182,7 @@
                 return;
             }
 
-            for (const file sur files) {
+            for (const file of files) {
                 const entry = await buildEntry(file);
                 const newIndex = selectedFiles.length;
                 selectedFiles.push(entry);
@@ -1569,7 +1569,7 @@
 
                 // Pre-load all source PDFs once
                 const pdfDocCache = {};
-                for (const item sur pageOrder) {
+                for (const item of pageOrder) {
                     const entry = selectedFiles[item.fileIndex];
                     if (entry.type === 'pdf' && !pdfDocCache[item.fileIndex]) {
                         const bytes = await entry.file.arrayBuffer();
