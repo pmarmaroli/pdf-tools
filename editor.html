@@ -1068,7 +1068,7 @@
                 showStatus('<span class="spinner"></span>Construction du PDF…', 'loading');
                 deselect();
 
-                const { PDFDocument, StandardFonts, rgb } = PDFLib;
+                const { PDFDocument, StandardFonts, rgb, degrees } = PDFLib;
                 const pdfDoc = await PDFDocument.load(originalPdfBytes);
                 const helv = await pdfDoc.embedFont(StandardFonts.Helvetica);
                 const pages = pdfDoc.getPages();
@@ -1087,27 +1087,49 @@
                     const cssW = parseFloat(layer.dataset.cssWidth);
                     const cssH = parseFloat(layer.dataset.cssHeight);
                     const { width: pw, height: ph } = page.getSize();
+                    // PDF.js honours the page's /Rotate when rendering the preview, so the
+                    // user places annotations in the *displayed* (rotated) frame. pdf-lib
+                    // draws in the unrotated content space, so we must undo that rotation.
+                    const rot = (((page.getRotation().angle % 360) + 360) % 360);
+                    const swap = rot === 90 || rot === 270;
+                    const dispW = swap ? ph : pw; // unrotated dimension that cssW maps to
+                    const dispH = swap ? pw : ph; // unrotated dimension that cssH maps to
 
                     for (const a of list) {
-                        // CSS px -> PDF points
-                        const px = (a.x / cssW) * pw;
-                        const pyTop = (a.y / cssH) * ph;
-                        const py = ph - pyTop; // pdf-lib origin is bottom-left
-                        const sizePts = (a.size / cssH) * ph;
+                        // normalized position in the displayed frame (0..1)
+                        const u = a.x / cssW;
+                        const v = a.y / cssH;
+                        // map to unrotated content space (origin bottom-left)
+                        let px, py;
+                        if (rot === 90)       { px = v * pw;       py = u * ph; }
+                        else if (rot === 180) { px = (1 - u) * pw; py = v * ph; }
+                        else if (rot === 270) { px = (1 - v) * pw; py = (1 - u) * ph; }
+                        else                  { px = u * pw;       py = (1 - v) * ph; }
+                        const sizePts = (a.size / cssH) * dispH;
                         const color = hexToRgb(a.color);
+                        // rotate drawn content by `rot` (CCW) so it appears upright once the
+                        // viewer applies the page's clockwise /Rotate. (px, py) is the centre;
+                        // bottomLeft() converts a centre + box size to pdf-lib's anchor corner.
+                        const rad = (rot * Math.PI) / 180;
+                        const cos = Math.cos(rad), sin = Math.sin(rad);
+                        const bottomLeft = (w, h) => ({
+                            x: px - (w / 2) * cos + (h / 2) * sin,
+                            y: py - (w / 2) * sin - (h / 2) * cos,
+                        });
 
                         if (a.type === 'text') {
                             const text = (a.text || '').trim();
                             if (!text) continue;
                             const textW = helv.widthOfTextAtSize(text, sizePts);
                             const textH = helv.heightAtSize(sizePts);
-                            // annotation is centered in CSS; replicate that for PDF
+                            const bl = bottomLeft(textW, textH);
                             page.drawText(text, {
-                                x: px - textW / 2,
-                                y: py - textH / 2,
+                                x: bl.x,
+                                y: bl.y,
                                 size: sizePts,
                                 font: helv,
                                 color: rgb(color.r, color.g, color.b),
+                                rotate: degrees(rot),
                             });
                         } else if (a.type === 'cross') {
                             drawCross(page, px, py, sizePts, color, rgb);
@@ -1120,13 +1142,15 @@
                                 color: rgb(color.r, color.g, color.b),
                             });
                         } else if (a.type === 'rect') {
-                            const wPts = (a.width / cssW) * pw;
-                            const hPts = (a.height / cssH) * ph;
+                            const wPts = (a.width / cssW) * dispW;
+                            const hPts = (a.height / cssH) * dispH;
+                            const bl = bottomLeft(wPts, hPts);
                             page.drawRectangle({
-                                x: px - wPts / 2,
-                                y: py - hPts / 2,
+                                x: bl.x,
+                                y: bl.y,
                                 width: wPts,
                                 height: hPts,
+                                rotate: degrees(rot),
                                 color: rgb(1, 1, 1),
                                 borderWidth: 0,
                             });
@@ -1154,13 +1178,15 @@
                             const embedded = isJpeg
                                 ? await pdfDoc.embedJpg(imgBytes)
                                 : await pdfDoc.embedPng(imgBytes);
-                            const wPts = (a.width / cssW) * pw;
-                            const hPts = (a.height / cssH) * ph;
+                            const wPts = (a.width / cssW) * dispW;
+                            const hPts = (a.height / cssH) * dispH;
+                            const bl = bottomLeft(wPts, hPts);
                             page.drawImage(embedded, {
-                                x: px - wPts / 2,
-                                y: py - hPts / 2,
+                                x: bl.x,
+                                y: bl.y,
                                 width: wPts,
                                 height: hPts,
+                                rotate: degrees(rot),
                             });
                         }
                     }
