@@ -611,6 +611,32 @@
             box-shadow: var(--shadow-xl);
         }
 
+        .split-btn {
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            color: var(--accent-warm, #059669);
+            border: 2px solid var(--accent-warm, #059669);
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 12px;
+        }
+
+        .split-btn:hover:not(:disabled) {
+            background: var(--accent-warm, #059669);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .split-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
         .info-box {
             background: rgba(30, 58, 138, 0.05);
             border-left: 4px solid var(--primary-color);
@@ -874,6 +900,7 @@
 
         <div class="download-section" id="downloadSection">
             <button class="download-btn" id="downloadBtn">⬇️ Télécharger le PDF</button>
+            <button class="split-btn" id="splitBtn">✂️ Séparer en pages (1 PDF par page, téléchargées en un ZIP)</button>
         </div>
 
         <div class="info-box">
@@ -893,6 +920,7 @@
     <script src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js" defer></script>
     <script src="https://unpkg.com/mammoth@1.8.0/mammoth.browser.min.js" defer></script>
     <script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
+    <script src="https://unpkg.com/jszip@3.10.1/dist/jszip.min.js" defer></script>
     <script>
         // Wait for DOM to be ready
         document.addEventListener('DOMContentLoaded', function() {
@@ -920,6 +948,7 @@
         const clearBtn = document.getElementById('clearBtn');
         const downloadSection = document.getElementById('downloadSection');
         const downloadBtn = document.getElementById('downloadBtn');
+        const splitBtn = document.getElementById('splitBtn');
         const filenameInput = document.getElementById('filenameInput');
         const filenamePreview = document.getElementById('filenamePreview');
         const status = document.getElementById('status');
@@ -1715,15 +1744,10 @@
             }
         });
 
-        // Download merged PDF
-        downloadBtn.addEventListener('click', async () => {
-            if (!mergedPdfBytes) return;
-
-            const filename = computeFinalFilename(filenameInput.value);
-
+        // Download a blob under the given filename, with mobile-friendly fallbacks.
+        async function downloadBlob(blob, filename) {
             debugLog(`📥 Téléchargement sous : ${filename}`);
 
-            const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
             const ua = navigator.userAgent || '';
             const isIOS = /iPad|iPhone|iPod/.test(ua) || (ua.includes('Mac') && 'ontouchend' in document);
             const isAndroid = /Android/i.test(ua);
@@ -1732,7 +1756,7 @@
             // 1) Try the Web Share API with a file — best UX on iOS/Android (opens "Save to Files", "Share", etc.)
             if (isMobile && navigator.canShare && typeof File !== 'undefined') {
                 try {
-                    const file = new File([blob], filename, { type: 'application/pdf' });
+                    const file = new File([blob], filename, { type: blob.type });
                     if (navigator.canShare({ files: [file] })) {
                         await navigator.share({ files: [file], title: filename });
                         debugLog('✅ Shared via Web Share API');
@@ -1746,13 +1770,13 @@
             }
 
             // 2) iOS Safari ignores the `download` attribute on blob URLs and silently drops the file.
-            //    Open the PDF in a new tab so the user can save it via the share sheet.
+            //    Open the file in a new tab so the user can save it via the share sheet.
             if (isIOS) {
                 const url = URL.createObjectURL(blob);
                 const win = window.open(url, '_blank');
                 if (!win) {
                     // Popup blocked — navigate the current tab as a last resort
-                    showStatus('⚠️ Fenêtre contextuelle bloquée. Appuyez à nouveau sur le bouton de téléchargement ou autorisez les fenêtres contextuelles, puis utilisez le bouton Partager pour enregistrer le PDF.', 'error');
+                    showStatus('⚠️ Fenêtre contextuelle bloquée. Appuyez à nouveau sur le bouton de téléchargement ou autorisez les fenêtres contextuelles, puis utilisez le bouton Partager pour enregistrer le fichier.', 'error');
                     location.href = url;
                 }
                 setTimeout(() => URL.revokeObjectURL(url), 60000);
@@ -1770,6 +1794,52 @@
             document.body.removeChild(link);
 
             setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        // Download merged PDF
+        downloadBtn.addEventListener('click', async () => {
+            if (!mergedPdfBytes) return;
+            const filename = computeFinalFilename(filenameInput.value);
+            const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+            await downloadBlob(blob, filename);
+        });
+
+        // Split the merged PDF into one single-page PDF per page, bundled into one ZIP download.
+        splitBtn.addEventListener('click', async () => {
+            if (!mergedPdfBytes) return;
+
+            try {
+                splitBtn.disabled = true;
+                showStatus('Découpage du PDF en pages…', 'loading');
+
+                const { PDFDocument } = PDFLib;
+                const srcDoc = await PDFDocument.load(mergedPdfBytes);
+                const pageCount = srcDoc.getPageCount();
+                const baseName = computeFinalFilename(filenameInput.value).replace(/\.pdf$/i, '');
+                const pad = String(pageCount).length;
+
+                const zip = new JSZip();
+                for (let i = 0; i < pageCount; i++) {
+                    showStatus(`Découpage de la page ${i + 1} sur ${pageCount}…`, 'loading');
+                    const pagePdf = await PDFDocument.create();
+                    const [copiedPage] = await pagePdf.copyPages(srcDoc, [i]);
+                    pagePdf.addPage(copiedPage);
+                    const pageBytes = await pagePdf.save();
+                    const pageNum = String(i + 1).padStart(pad, '0');
+                    zip.file(`${baseName}_page_${pageNum}.pdf`, pageBytes);
+                }
+
+                showStatus('Compression du ZIP…', 'loading');
+                const zipBlob = await zip.generateAsync({ type: 'blob' });
+                await downloadBlob(zipBlob, `${baseName}_pages.zip`);
+
+                showStatus(`✅ ${pageCount} page(s) séparée(s) et téléchargée(s) dans un ZIP !`, 'success');
+            } catch (error) {
+                console.error('Error splitting PDF:', error);
+                showStatus(`❌ Erreur : ${error.message}`, 'error');
+            } finally {
+                splitBtn.disabled = false;
+            }
         });
 
         // === Lightbox (page zoom) ===
